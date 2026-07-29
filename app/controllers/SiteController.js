@@ -3,15 +3,22 @@ const Blog = require('../models/Blog');
 class SiteController {
     // [GET] / (Trang chủ)
     index(req, res, next) {
-        // Dùng Model Blog để tìm kiếm toàn bộ dữ liệu trong Collection
-        Blog.find({})
+        // Lấy danh sách, dùng .lean() để chuyển sang JS Object thuần
+        Blog.find({}).lean()
             .then(blogs => {
-                // Trả dữ liệu dạng JSON về trình duyệt theo yêu cầu Bước 5
-                res.json(blogs);
+                // Bảo vệ: Kiểm tra nếu blogs bị null/undefined thì khởi tạo mảng rỗng []
+                blogs = blogs || [];
+
+                // Truyền biến 'blogs' sang file giao diện home.hbs
+                res.render('home', { blogs });
             })
             .catch(error => {
-                // Nếu có lỗi, chuyển đến middleware xử lý lỗi
-                next(error);
+                // Ghi log lỗi để dễ kiểm tra
+                console.error("Lỗi khi lấy danh sách bài viết:", error);
+                
+                // Trả về trang home với mảng rỗng thay vì làm sập app (Crash)
+                // Hoặc bạn có thể chuyển tiếp lỗi cho middleware xử lý lỗi: next(error);
+                res.render('home', { blogs: [] });
             });
     }
 
