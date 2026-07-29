@@ -1,9 +1,16 @@
 const express = require('express');
 const { engine } = require('express-handlebars');
 const path = require('path');
-const route = require('../routes'); // Dùng ../ để trỏ ra thư mục routes ở ngoài gốc
+const route = require('../routes'); // Đi ra ngoài src/ để vào routes/
 
 const app = express();
+
+// Bước 3: Nạp db từ thư mục ../config/db
+const db = require('../config/db'); // Đi ra ngoài src/ để vào config/
+
+// Thực thi kết nối DB
+db.connect();
+
 const port = 3000;
 
 // 1. CẤU HÌNH HỆ THỐNG

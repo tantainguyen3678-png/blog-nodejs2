@@ -1,7 +1,18 @@
+const Blog = require('../models/Blog');
+
 class SiteController {
     // [GET] / (Trang chủ)
-    index(req, res) {
-        res.render('home');
+    index(req, res, next) {
+        // Dùng Model Blog để tìm kiếm toàn bộ dữ liệu trong Collection
+        Blog.find({})
+            .then(blogs => {
+                // Trả dữ liệu dạng JSON về trình duyệt theo yêu cầu Bước 5
+                res.json(blogs);
+            })
+            .catch(error => {
+                // Nếu có lỗi, chuyển đến middleware xử lý lỗi
+                next(error);
+            });
     }
 
     // [GET] /about
