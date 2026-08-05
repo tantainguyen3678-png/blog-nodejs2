@@ -1,9 +1,12 @@
+// 1. Load dotenv ĐẦU TIÊN để tránh lỗi process.env bị undefined ở các file require phía dưới
+require('dotenv').config(); 
+
 const express = require('express');
 const { engine } = require('express-handlebars');
 const path = require('path');
 const methodOverride = require('method-override');
 
-// LƯU Ý: Kiểm tra lại đường dẫn tới routes và config/db cho đúng với cấu trúc thư mục của bạn
+// 2. Import routes và db (lúc này process.env đã sẵn sàng)
 const route = require('../routes'); 
 const db = require('../config/db'); 
 
@@ -12,19 +15,18 @@ const app = express();
 // Kết nối CSDL
 db.connect();
 
-const port = 3000;
+// Cấu hình Port linh hoạt
+const port = process.env.PORT || 3000;
 
-// 1. CẤU HÌNH MIDDLEWARE (Đúng thứ tự)
-app.use(express.static(path.join(__dirname, 'public')));
+// 3. MIDDLEWARE
+// Lưu ý: Adjust đường dẫn static tùy thuộc vào vị trí thực tế của thư mục public
+app.use(express.static(path.join(__dirname, '../public'))); 
 
-// Parser dữ liệu từ Form/JSON (BẮT BUỘC ĐẶT TRƯỚC methodOverride)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// Ghi đề phương thức HTTP (PUT, DELETE) từ Form
 app.use(methodOverride('_method'));
 
-// 2. TEMPLATE ENGINE (HANDLEBARS)
+// 4. TEMPLATE ENGINE
 app.engine('hbs', engine({ 
     extname: '.hbs',
     helpers: {
@@ -42,12 +44,12 @@ app.engine('hbs', engine({
     }
 }));
 app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views')); // Hoặc path.join(__dirname, '../views') nếu views ở thư mục gốc
 
-// 3. KHỞI TẠO ROUTES
+// 5. ROUTES
 route(app);
 
-// 4. KHỞI CHẠY MÁY CHỦ
+// 6. KHỞI CHẠY SERVER
 app.listen(port, () => {
     console.log(`\n🚀 Server đang chạy thành công tại: http://localhost:${port}`);
 });

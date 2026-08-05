@@ -16,6 +16,7 @@
     "express": "^5.2.1",
     "express-handlebars": "^8.0.1",
     "method-override": "^3.0.0",
+    "mongodb": "^7.5.0",
     "mongoose": "^9.8.1"
   },
   "devDependencies": {

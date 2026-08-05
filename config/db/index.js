@@ -1,16 +1,23 @@
 const mongoose = require('mongoose');
 
-// Tạo một hàm kết nối bất đồng bộ (async/await) để đảm bảo kết nối xong mới chạy tiếp
-async function connect(){
+async function connect() {
     try {
-        // Chuỗi kết nối trỏ tới máy chủ cục bộ và Database đã tạo ở Buổi 08
-        await mongoose.connect('mongodb://127.0.0.1:27017/blog_education_dev');
+        // Kiểm tra xem biến môi trường đã nạp chưa
+        if (!process.env.MONGODB_URI) {
+            throw new Error('❌ Chưa cấu hình MONGODB_URI trong file .env!');
+        }
+
+        // Bổ sung options giúp ổn định kết nối và xử lý lỗi DNS SRV
+        await mongoose.connect(process.env.MONGODB_URI, {
+            family: 4,               // Ép ưu tiên IPv4 để khắc phục lỗi querySrv ECONNREFUSED
+            serverSelectionTimeoutMS: 5000, // Giới hạn thời gian chờ kết nối là 5 giây (thay vì treo 10s)
+        });
+
         console.log('✅ Kết nối Database thành công!');
     } catch (error) {
         console.log('❌ Kết nối Database thất bại!');
-        console.log(error);
+        console.log(error.message || error);
     }
 }
 
-// Xuất hàm connect ra ngoài
 module.exports = { connect };
